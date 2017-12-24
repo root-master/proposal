@@ -1,0 +1,303 @@
+\documentclass[letterpaper,titlepage]{article}
+\usepackage[margin=1in,dvips]{geometry}
+\usepackage{graphicx,float,psfrag,amsmath,amsthm,amssymb}
+\usepackage{natbib}
+\usepackage{url,color,booktabs}
+\usepackage{hyperref}
+\input{MACPdef}
+\input{MACPdef-ams}
+\input{MACPdef-ams-thm}
+
+\graphicspath{{grf/},{plot/}}
+
+\bibpunct[, ]{(}{)}{;}{a}{,}{,} % Should be the natbib default but it isn't!
+
+\title{\textbf{State Representation in Reinforcement Learning}}
+
+\author{\textbf{Jacob Rafati}\thanks{GitHub Repository: \url{https://github.com/root-master/deep-hrl}}\\ Electrical Engineering and Computer Science \\ Computational Cognitive Neuraocience Lab \\ University of California, Merced \\ \texttt{jrafatiheravi@ucmerced.edu} \\ \\ Ph.D. Advisor: David C. Noelle, Ph.D. \\ \texttt{dnoelle@ucmerced.edu} \\}
+\date{}
+% \thanks{GitHub Repository: \url{https://github.com/root-master/deep-rl}}
+\begin{document}
+
+%\maketitle
+
+\begin{titlepage}
+	\centering
+	\includegraphics[width=0.20\textwidth]{UCMercedSeal}\par\vspace{1cm}
+	{\scshape\LARGE University of California, Merced \par}
+	\vspace{1cm}
+	{\scshape\Large Ph.D. Proposal\par}
+	\vspace{1.5cm}
+	{\huge\bfseries State Representation \\ in Reinforcement Learning \par}
+	\vspace{2cm}
+	{\Large\itshape Jacob Rafati\par}
+	\vspace{1cm}
+	Electrical Engineering and Computer Science \\ Computational Cognitive Neuraocience Lab \\ University of California, Merced \\ 
+	\vspace{0.5cm}
+	\texttt{jrafatiheravi@ucmerced.edu}
+	\vfill
+	supervised by\par
+	Dr.~David~C. Noelle
+
+	\vfill
+
+% Bottom of the page
+	{\large \today\par}
+\end{titlepage}
+
+
+\tableofcontents
+\newpage
+\section*{Abstract} 
+\label{sec:abstract}
+
+\subsection*{Keywords} 
+\newpage
+
+\section{Introduction} 
+\label{sec:introduction}
+\newpage
+
+\section{Preliminaries} 
+\label{sec:background}
+Most of this section is taken from ``introduction to reinforcement learning'' book by \cite{RL-Book:Sutton:1998} 
+\subsection{Notation}
+In entire this document, the random variables and matrices are denote by capital letter like $X$ and the vectors and value that random variables can take are denoted by lowercase letter like $x$. $\textrm{Pr}$ and $p$ is reserved for probability  distribution function. For a sequence of variables, $\{ X_i , i=0,\dots,t \}$ we use the notation of $X_{0:t}$.
+\subsection{Reinforcement learning problem}
+\label{sec:RL}
+\subsubsection*{Agent and Environement}
+The reinforcement learning problem is a framework of the problem of learning with interaction with \emph{environment} to achieve a \emph{goal}. The learner and decision maker is called the \emph{agent} and everything outside the agent is called the \emph{environment}. The agent and environment interact at each of a sequenceof discrete time steps, $t = 0,1,2,\dots$ ($t \in [T],~T \in \mathbb{N}$). 
+\subsubsection*{Experience: State, Action, Reward, Next State}
+At each time step $t$, the agent receives a representation of the environment's \emph{state}, $S_t \in \mathcal{S}$, where $\mathcal{S}$ is set of all possible states, and on that basis agent selects an \emph{action}, $A_t \in \mathcal{A}(S_t)$, where $\mathcal{A}(S_t)$ is a set of all available actions for agent in state $S_t$. One time step later at $t+1$, as a consequence of agent's action, the agent receives a \emph{reward} $R_{t+1} \in \mathbb{R}$  and also an update on the new state $S_{t+1}$ from environment. Each cycle of interaction is called an \emph{experience}, $E_{t+1} = \{ S_t,A_t,R_{t+1}, S_{t+1} \}$. Figure \ref{f:agent-env} summerizes the agent--environment interaction. Ideally state should be equivalent to the \emph{state of dynamical sysytem}, but here we refer to state as whatever information is available to the agent.  
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{agent-env}
+\caption{The agent--environment interaction in reinforcement learning.}
+\label{f:agent-env}
+\end{figure}
+
+
+\subsubsection*{Policy Function}
+At each time step agent implements a mapping from states to possible actions $\pi_t : \mathcal{S} \rightarrow \mathcal{A}$. This mapping is called agent's \emph{policy}. The stochastic policy can be defined as the probability of taking action $A_t = a$ at state $S_t = s$
+\[
+\pi_t ( a | s ) = p( A_t = a | S_t = s ).
+\] 
+The deterministic policy can be obtained as
+\[
+a = \pi_t ( s ) = \argmax_{a'} ~ \pi_t ( a' | s )
+\]
+\subsubsection*{Goals}
+The objective of reinforcement learning problem is the maximization of the expected value of \emph{return} i.e. the cumulative sum of a received reward
+\begin{align}
+G_t = \sum_{t' = t + 1}^{T} \gamma^{t' - t - 1} R_{t'}, \quad \forall t \in [T],
+\end{align}
+where $T \in \mathbb{N}$ is a final step and $\gamma \in [0,1]$ is a discount factor. As $\gamma \rightarrow 1$, the objective takes future rewards into account more strongly (farsighted agent) and if $\gamma \rightarrow 0$ the agent is only concerend about maximizing the immediate reward (myopic agent). Having $\gamma < 1$ can bound the return $G_t < \infty$ when $T \rightarrow \infty$. The goal of reinforcement learning problem is finding an optimal policy that maximizes the expected return. 
+\subsubsection*{Episodes}
+The agent–environment interaction can often break into subsequences, which we call \emph{episodes}, such as plays of a game or any sort of repeated interactions. Each episode ends when time is over i.e. $t = T$ or agent reaches to an absorbing \emph{terminal} state.  
+\subsubsection*{Markov Property}
+A state signal that succeeds in retaining all relevant information is said to be Markov, or to have the Markov property. Consider how a general environment might respond at time $t + 1$ to the action taken at time $t$. In general the dynamics can be defined only by specifying the complete joint probability distribution:
+\[
+\Pr \{ S_{t+1} = s', R_{t+1} = r ~ | ~ S_{0:t}, A_{0:t}  \} \quad \forall s',r.
+\]
+If the state signal has the Markov property, then the environment's response at $t + 1 $ depends only on the state and action representations at $t$, in which case the environment's dynamics can be defined by
+\begin{align}
+p( s', r | s, a ) = \Pr \{ S_{t+1} = s', R_{t+1} = r ~ | ~ S_{t}=s, A_{t}=a  \}.
+\label{eq:dynamics}
+\end{align}
+
+\subsubsection*{Markov Decision Processes}
+A reinforcement learning task that satisfies the Markov property is called a Markov decision process (MDP). If the state and action spaces are finite, then it is called a finite Markov decision process. A finite MDP is defined by its state and action sets and by the one-step \emph{dynamics} of the environment specified by \eqref{eq:dynamics}. These quantities completely specify the dynamics of a finite MDP. In this proposal, we implicitly assumes the environment is a finite MDP. Given the dynamics of environment, we can compute the \emph{state-transition probabilities},
+\begin{align}
+p(s' | s, a) = \Pr \{ S_{t+1} = s' ~ | ~ S_t = s, A_t = a \} = \sum_{r} p(s', r | s, a),
+\label{eq:state-transition-probabilities}
+\end{align}
+Also we can compute the expected rewards for state–action pairs,
+\begin{align}
+r(s,a) = \bbE[ R_{t+1} | S_t = s, A_t = a ] = \sum_{r} r \sum_{s' \in \calS} p(s', r | s, a),
+\label{eq:expected-reward}
+\end{align}
+and the expected rewards for state–action-next state triples
+\begin{align}
+r(s,a,s') = \bbE[ R_{t+1} | S_t = s, A_t = a , S_{t+1} = s' ] = \frac{\sum_{r} r  p(s', r | s, a)}{p(s' | s, a)},
+\end{align}
+
+\subsubsection*{Value Function}
+The value of state $s$ under a policy $\pi$, denoted $v_{\pi}(s)$ is the expected return when starting from $s$ and following $\pi$ thereafter. For MDPs, $v_{\pi}(s)$ can be defined as
+
+\begin{equation} 
+\begin{split}
+v_{\pi}& :  \calS \rightarrow \bbR \\
+v_{\pi}& (s) = \bbE_{\pi} [G_t | S_t = s] = \bbE_{\pi} \bigg[ \sum_{t' = t + 1}^{T} \gamma^{t' - t - 1} R_{t'} ~ \bigg| ~  S_t = s \bigg],
+\end{split}
+\label{eq:state-value}
+\end{equation}
+where $\bbE_{\pi}[.]$ denotes the expected value of random variable given that the agent follows policy $\pi$. Value of terminal state by definition is always zero. We call the function $v_{\pi}$ the state-value function for policy $\pi$. Similarly, we can define the state-action value function $q_{\pi} (s,a)$ for policy $\pi$ as 
+\begin{equation} 
+\begin{split}
+q_{\pi}& :  \calS \times \calA \rightarrow \bbR \\
+q_{\pi}& (s,a) = \bbE_{\pi} [G_t | S_t = s, A_t = a] = \bbE_{\pi} \bigg[ \sum_{t' = t + 1}^{T} \gamma^{t' - t - 1} R_{t'} ~ \bigg| ~  S_t = s, A_t = a \bigg],
+\end{split}
+\label{eq:state-action-value}
+\end{equation}
+Based on these definitions, the two value functions, $v_{\pi}$ and $q_{\pi}$ are related
+\begin{align}
+v_{\pi}(s) = \sum_{a} \pi( a | s ) ~ q_{\pi} (s,a).
+\label{eq:v-q-identity}
+\end{align}
+%The value functions $v_{\pi}$ and $q_{\pi}$ can be estimated using the methods like Monte Carlo methods that are involve averaging over many random samples of actual returns.
+\subsubsection*{Bellman Equations}
+For any policy $\pi$ and any state $s$, the following consistency condition holds between the value of $s$ and the value of its possible successor states $s'$:
+\begin{align}
+v_{\pi}(s) &= \sum_{a} \pi(a | s) \sum_{s',r} p(s',r | s, a) \big[ r + \gamma v_{\pi} (s') \big], \quad \forall s \\
+q_{\pi}(s,a) &=  \sum_{s',r} p(s',r | s, a) \big[ r + \gamma v_{\pi} (s') \big], \quad \forall s,a. 
+\end{align}
+We can see that \eqref{eq:v-q-identity} holds for Bellman's equations. We can rewrite Bellman equations using expected reward and state transition probabilities in \eqref{eq:state-transition-probabilities} and \eqref{eq:expected-reward}:
+\begin{align}
+v_{\pi}(s) &= \sum_{a} \pi(a | s) \big[ r(s,a) + \gamma \sum_{s'} p(s'| s, a)  v_{\pi} (s') \big], \quad \forall s. \\
+q_{\pi}(s,a) &=  r(s,a) + \gamma \sum_{s'} p(s'| s, a)  v_{\pi} (s'), \quad \forall s,a.
+\end{align}
+\subsubsection*{Optimal Value Functions}
+The optimal state-value function, denoted $v_*$ is the objective function in reinforcement learning problem
+\begin{align}
+v_* = \max_{\pi} v_{\pi} (s), \quad \forall s.
+\end{align}
+There is always at least one policy that is better than or equal to all other policies. This is an optimal policy
+\begin{align}
+\pi_* = \argmax_{\pi} v_{\pi} (s), \quad \forall s.
+\end{align}
+Optimal policies also share the same optimal action-value function, denoted $q_∗$
+\begin{align}
+q_* = \max_{\pi} q_{\pi} (s,a), \quad \forall s,a.
+\end{align}
+We can easily obtain optimal policies once we have found the optimal value functions, $v_∗$ or $q_∗$, which satisfy the Bellman optimality equations:
+\begin{align}
+v_{*}(s) &= \max_a \bigg\{ r(s,a) + \gamma \sum_{s'} p(s' | s, a) v (s') \bigg\}, \quad \forall s. \\
+q_{*}(s,a)  &=  \bigg\{ r(s,a) + \gamma \sum_{s'} p(s'| s, a)  \max_{a'} \{ q_* (s',a') \} \bigg\}, \quad \forall s,a.
+\end{align}
+Note that $v_{*}(s) = \max_{a} q_{*}(s,a)$. It's easy to prove that equation $\mathbb{T}[v] = v$ with
+\[
+H[v(s)] = \max_a \bigg\{ r(s,a) +  \gamma \sum_{s'} p(s'| s, a)  v (s') \bigg\}, \quad \forall s.
+\]
+has a unique fixed point $v_*$ (function in this functional case) and such function is the optimal value function. Once we have optimal value function $v_*$ or $q_*$, we can also find the optimal policy map function $\pi_*$:
+\begin{align}
+\pi_* (s) &= \argmax_{a} \bigg\{ r(s,a) +  \gamma \sum_{s'} p(s'| s, a)  v (s') \bigg\}, \quad \forall s. \\
+\pi_* (s) &= \argmax_{a} q_*(s,a), \quad \forall s.
+\end{align} 
+
+\subsection{Policy and Value Iteration Algorithms}
+\subsubsection*{Finding the Optimal Value and Policy Functions}
+There are two main methods in literature to find the optimal value and policy functions.  
+
+\subsection{SARSA: Online Temporal Difference Method}
+
+\subsection{Q-Learning}
+
+\subsection{Generalization in Reinforcement Learning}
+\subsubsection*{The Curse of Dimentionality of The State Space}
+\label{sec:curse-of-dimentionality}
+
+\subsubsection*{Artficial Neural Netwroks}
+
+
+\section{Background and Related Works}
+\newpage
+
+\section{Sparse Representation of State in Reinforcement Learning}
+\label{sec:sparse-TD-problem}
+
+\subsection{Introduction}
+\subsection{Background and related works}
+\subsection{Proposed Methods}
+\subsection{Results and Discussion}
+\subsection{Future Works}
+\subsection{Conclusion}
+\newpage
+
+\section{Subgoal Discovery in Hierarchical Reinforcement Problem}
+\label{sec:HRL}
+
+\subsection{Introduction}
+Human behavior displays a hierarchical organization \citep{PLOS:HRL:2014,HRL-BOTVINICK:2009}. In a goal-directed tasks, it seems reasonable to 
+set some sub-goals and try to accomplish these sub-goals in order to solve the original task. In a very simple goal-directed task of ``making a cup of coffee'', the task (or the \emph{goal}) can be decomposed to several sub-tasks (or \emph{sub-goal}):
+\begin{itemize}
+\item brewing coffee.
+\item pouring coffee to a mug.
+\item adding suger (if desired).
+\item adding milk (if desired).
+\end{itemize}
+“making coffee ready using a machine” and “pouring coffee and adding milk and sugar” which each in another level can be divided to sub-tasks like “putting enough coffee in machine”, “filling machine with enough water”, “turning on coffee machine and set the brewing level”, “pouring a present cup with coffee”, “adding milk” and “adding sugar” and these subgoals also can be divided to another level of subgoals or concrete actions.
+
+\subsection{Background and Related works}
+\subsection{Proposed Methods}
+\subsection{Results and Discussion}
+\subsection{Future Works}
+\subsection{Conclusion}
+\newpage
+
+\section{Experiments and Applications}
+
+\subsection{Toy Task: The Rooms Problem}
+To provide an illustration of HRL in action, we applied the subgoal discovery algorithm to a toy \emph{Rooms problem} introduced by \citep{RL-Book:Sutton:1998}. Given initial state $S$ and goal state $G$, the agent's task is to navigate through a set of rooms interconnected by doorways, in order to reach the goal state $G$ (Figure \ref{g:4-room}). In each state, the agent can select any of eight deterministic primitive actions, each of which moves the agent to one of the adjacent squares (unless a wall prevents this movement). The rooms are reachable through \emph{doors} and agent is only allowed to use these doors to reach the other room. Agent receives reward of $-1$ for each action, $-2$ for actions that results bumping to the walls and $0$ when reaching to $G$. 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{4-room.png}
+\caption{The rooms problem, adapted from \citep{HRL-BOTVINICK:2009}}
+\label{g:4-room}
+\end{figure}
+
+\subsection{Games: Montezuma's Revenge}
+Montezuma's revenge is one of the hardest games available
+through the \emph{Arcade Learning Environment} (ALE) \citep{ALE:Bellemare:2013}. The game is infamous for challenging agents with lethal traps and sparse rewards \citep{FeUdal:HRL:Sahsa:2017}. The game (Figure \ref{g:montezuma-revenge}) requires the player to navigate the explorer (in red) through several rooms while collecting treasures. In order to pass through doors (in the top right and top left corners of the figure), the player has to first pick up the key2 \citep{HRL:MIT:Kulkarni:2016}.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{montezuma-revenge.png}
+\caption{A sample screen from the ATARI 2600 game called `'Montezuma's Revenge'' adopted from \citep{HRL:MIT:Kulkarni:2016}}
+\label{g:montezuma-revenge}
+\end{figure}
+
+\subsection{Path Planning for Autonoumous Robot Navigation}
+Navigation is one of the most important robotic tasks. One classic approach consists of three steps: build a map of the environment through, e.g., SLAM, plan a path using the map, and finally execute the path. High-fidelity geometric maps make it easier for path planning and execution. However, building such maps is time-consuming \citep{ROBOT-NAVIGATION-Intention-Net:2017}. Further, even small environmental changes may render them partially invalid. Alternatively, the optical flow approach does not use maps at all and relies on the visual perception of the local environment for navigation. While this avoids the difficulty of building and maintaining accurate geometric maps, it is difficult to achieve effective goal-directed global navigation in complex geometric environments without maps. Our approach uses 2-D floor plans available for indoor environments. We use robotics simulator such as Gebezo and Robot Operating System (ROS) to simulate environments for robotcs navigation tasks. 
+
+\subsection{Bipedal Locomotion and Reaching Tasks}
+Learning physics-based locomotion skills is a difficult problem. With this simulation we aim to learn a variety of environment-aware locomotion skills with a limited amount of prior knowledge. We investigate the task of reaching and also locomotion using two-level hierarchical control framework. Results are demonstrated on a simulated 3D biped \citep{Deep-LOCO:Peng:2017,bipedal-creatures:Geijtenbeek:2013}.
+For animating virtual characters, physics based simulation is used by \citep{bipedal-creatures:Geijtenbeek:2013} (Figure \ref{g:bipedal-creatures}). The subgoal discovery algorithm can be applied to the experience space of locomotion task and learning to reach for these animated creatures in hierarchical reinforcement learning framework.  
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{bipedal-creatures.png}
+\caption{Physics-based simulation of locomotion for a variety of creatures driven by 3D muscle-based control adopted from \citep{bipedal-creatures:Geijtenbeek:2013}}
+\label{g:bipedal-creatures}
+\end{figure}
+
+
+
+\subsection{Autonoumous Driving}
+
+We use CARLA, an open-source simulator for autonomous driving research \citep{CARLA:2017}. CARLA has been built for flexibility and realism in the rendering and physics simulation. It is implemented as an open-source layer over Unreal Engine 4 (UE4). CARLA has been developed from the ground up to support development, training, and validation of autonomous urban driving systems. The simulation platform supports flexible specification of sensor suites and environmental conditions. We use CARLA to study the performance of subgoal discovery algorithms for hierarchical reinforcement learning applied to autonomous driving. We use CARLA to stage controlled goal-directed navigation scenarios of increasing difficulty. We manipulate the complexity of the route that must be traversed, the presence of traffic, and the environmental conditions (Figures \ref{g:CARLA} and \ref{g:CARLA-2}). 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{CARLA.png}
+\caption{A third-person view in four weather conditions. Clock- wise from top left: clear day, daytime rain, daytime shortly after rain, and clear sunset adopted from \citep{CARLA:2017}}
+\label{g:CARLA}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{CARLA-2.png}
+\caption{Three of the sensing modalities provided by CARLA. From left to right: normal vision camera, ground-truth depth, and ground-truth semantic segmentation. Depth and semantic segmen- tation are pseudo-sensors that support experiments that control for the role of perception. Additional sensor models can be plugged in via the API adopted from \citep{CARLA:2017}}
+\label{g:CARLA-2}
+\end{figure}
+
+
+\newpage
+\section{Research and Writing Timetable}
+\label{sec:timetable}
+
+\newpage
+\section{Conclusion}
+\label{sec:conclusion}
+
+\newpage
+\bibliography{myBib}
+\bibliographystyle{apalike}
+\end{document}

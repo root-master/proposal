@@ -1,0 +1,31 @@
+\contentsline {section}{\numberline {1}Introduction}{3}{section.1}
+\contentsline {section}{\numberline {2}Preliminaries}{4}{section.2}
+\contentsline {subsection}{\numberline {2.1}Notation}{4}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Reinforcement learning problem}{4}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Policy and Value Iteration Algorithms}{7}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}SARSA: Online Temporal Difference Method}{7}{subsection.2.4}
+\contentsline {subsection}{\numberline {2.5}Q-Learning}{7}{subsection.2.5}
+\contentsline {subsection}{\numberline {2.6}Generalization in Reinforcement Learning}{7}{subsection.2.6}
+\contentsline {section}{\numberline {3}Background and Related Works}{7}{section.3}
+\contentsline {section}{\numberline {4}Sparse Representation of State in Reinforcement Learning}{8}{section.4}
+\contentsline {subsection}{\numberline {4.1}Introduction}{8}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}Background and related works}{8}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}Proposed Methods}{8}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}Results and Discussion}{8}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}Future Works}{8}{subsection.4.5}
+\contentsline {subsection}{\numberline {4.6}Conclusion}{8}{subsection.4.6}
+\contentsline {section}{\numberline {5}Subgoal Discovery in Hierarchical Reinforcement Problem}{9}{section.5}
+\contentsline {subsection}{\numberline {5.1}Introduction}{9}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Background and Related works}{9}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Proposed Methods}{9}{subsection.5.3}
+\contentsline {subsection}{\numberline {5.4}Results and Discussion}{9}{subsection.5.4}
+\contentsline {subsection}{\numberline {5.5}Future Works}{9}{subsection.5.5}
+\contentsline {subsection}{\numberline {5.6}Conclusion}{9}{subsection.5.6}
+\contentsline {section}{\numberline {6}Experiments and Applications}{10}{section.6}
+\contentsline {subsection}{\numberline {6.1}Toy Task: The Rooms Problem}{10}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Games: Montezuma's Revenge}{10}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Path Planning for Autonoumous Robot Navigation}{11}{subsection.6.3}
+\contentsline {subsection}{\numberline {6.4}Bipedal Locomotion and Reaching Tasks}{11}{subsection.6.4}
+\contentsline {subsection}{\numberline {6.5}Autonoumous Driving}{12}{subsection.6.5}
+\contentsline {section}{\numberline {7}Research and Writing Timetable}{14}{section.7}
+\contentsline {section}{\numberline {8}Conclusion}{15}{section.8}

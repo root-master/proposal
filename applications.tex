@@ -1,0 +1,82 @@
+\documentclass[letterpaper,titlepage]{article}
+\usepackage[margin=1in,dvips]{geometry}
+\usepackage{graphicx,float,psfrag,amsmath,amsthm,amssymb}
+\usepackage{natbib}
+\usepackage{url,color,booktabs}
+\usepackage{hyperref}
+\input{MACPdef}
+\input{MACPdef-ams}
+\input{MACPdef-ams-thm}
+
+\graphicspath{{grf/},{plot/}}
+
+\bibpunct[, ]{(}{)}{;}{a}{,}{,} % Should be the natbib 
+\begin{document}
+
+\section{Experiments and Applications}
+
+\subsection{Toy Task: The Rooms Problem}
+To provide an illustration of HRL in action, we apply the subgoal discovery algorithm to the \emph{Rooms problem} introduced by \citep{RL-Book:Sutton:1998}. Given initial state $S$ and goal state $G$, the agent's task is to navigate through a set of rooms interconnected by doorways, in order to reach the goal state $G$ (Figure \ref{g:4-room}). In each state, the agent can select any of eight deterministic primitive actions, each of which moves the agent to one of the adjacent squares (unless a wall prevents this movement). The rooms are reachable through \emph{doors} and agent is only allowed to use these doors to reach the other room. Agent receives reward of $-1$ for each action, $-2$ for actions that results bumping to the walls and $0$ when reaching to $G$. 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{4-room.png}
+\caption{The rooms problem, adapted from \citep{HRL-BOTVINICK:2009}}
+\label{g:4-room}
+\end{figure}
+
+\subsection{ATARI Games: Montezuma's Revenge}
+The Arcade Learning Environment (ALE) is an evaluation platform that provides an interface to hundreds of Atari 2600 game environments. It supports a variety of different problem settings and it has been receiving increasing attention from the scientific community, leading to some high-profile success stories such as the much publicized Deep Q-Networks (DQN) \citep{DeepMind-ATARI-2013,ALE:Bellemare:2013}. Montezuma's revenge is one of the hardest games available through ALE. The game is infamous for challenging agents with lethal traps and sparse rewards \citep{FeUdal:HRL:Sahsa:2017}. The game (Figure \ref{g:montezuma-revenge}) requires the player to navigate the explorer (in red) through several rooms while collecting treasures. In order to pass through doors (in the top right and top left corners of the figure), the player has to first pick up the key \citep{HRL:MIT:Kulkarni:2016}. The hierarchical nature of this game made it a common experiment for testing hierarchical reinforcement learning algorithm \citep{HRL:MIT:Kulkarni:2016,FeUdal:HRL:Sahsa:2017}.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{montezuma-revenge.png}
+\caption{A sample screen from the ATARI 2600 game called `'Montezuma's Revenge'' adopted from \citep{HRL:MIT:Kulkarni:2016}}
+\label{g:montezuma-revenge}
+\end{figure}
+
+\subsection{Path Planning for Autonoumous Robot Navigation}
+Navigation is one of the most important robotic tasks. One classic approach consists of three steps: build a map of the environment through, e.g., Simultaneous Localization and Mapping (SLAM), plan a path using the map, and finally execute the path. High-fidelity geometric maps make it easier for path planning and execution. However, building such maps is time-consuming \citep{ROBOT-NAVIGATION-Intention-Net:2017}. Further, even small environmental changes may render them partially invalid. Alternatively, the optical flow approach does not use maps at all and relies on the visual perception of the local environment for navigation. While this avoids the difficulty of building and maintaining accurate geometric maps, it is difficult to achieve effective goal-directed global navigation in complex geometric environments without maps. Our approach uses 2-D floor plans available for indoor environments. We use robotics simulator such as Gebezo and Robot Operating System (ROS) to simulate environments for robotics navigation tasks. 
+
+\subsection{Bipedal Locomotion and Reaching Tasks}
+Learning physics-based locomotion skills is a difficult problem. With this simulation we aim to learn a variety of environment-aware locomotion skills with a limited amount of prior knowledge. We investigate the task of reaching and also locomotion using two-level hierarchical control framework. Results are demonstrated on a simulated 3D biped \citep{Deep-LOCO:Peng:2017,bipedal-creatures:Geijtenbeek:2013}.
+For animating virtual characters, physics based simulation is used by \citep{bipedal-creatures:Geijtenbeek:2013} (Figure \ref{g:bipedal-creatures}). The subgoal discovery algorithm can be applied to the experience space of locomotion task and learning to reach for these animated creatures in hierarchical reinforcement learning framework.  
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{bipedal-creatures.png}
+\caption{Physics-based simulation of locomotion for a variety of creatures driven by 3D muscle-based control adopted from \citep{bipedal-creatures:Geijtenbeek:2013}}
+\label{g:bipedal-creatures}
+\end{figure}
+
+\subsection{Autonoumous Driving}
+The capability of autonomous robotic systems to successfully navigate through difficult environments continues to advance \citep{Autonomous:Silver:2010,Deep-Car-2017,CARLA:2017}.
+Driving is usually a navigation task from an initial state to a destination (goal) given the map of the environment. One the most difficult form is navigation in densely populated urban environments due to complex multi-agent dynamics at traffic intersections; the necessity to track and respond to the motion of tens or hundreds of other actors \citep{CARLA:2017}. Training and validation of sensorimotor control models for urban driving in the physical world is beyond the reach of most research groups.
+An alternative is to train and validate driving strategies in simulation. There are several open source driving simulators that we will use to test our sub-goal discovery and hierarchical reinforcement learning algorithms in order to approach the complex problem of autonomous driving.
+
+TORCS is a highly portable multi platform car racing simulation. It is used as ordinary car racing game, as AI racing game and as research platform \citep{TORCS} (Figure \ref{g:TORCS}).
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{TORCS-2.png}
+\includegraphics[width=0.4\textwidth]{TORCS-1.png}
+\caption{Example shots from \citep{TORCS}. Left: A third-person view. Right: Perception from the driver's perspective shiled.}
+\label{g:TORCS}
+\end{figure}
+
+
+CARLA is another open-source simulator for autonomous driving research \citep{CARLA:2017}. CARLA has been built for flexibility and realism in the rendering and physics simulation. It is implemented as an open-source layer over Unreal Engine 4 (UE4). CARLA has been developed from the ground up to support development, training, and validation of autonomous urban driving systems. The simulation platform supports flexible specification of sensor suites and environmental conditions. We use CARLA to study the performance of subgoal discovery algorithms for hierarchical reinforcement learning applied to autonomous driving. We use CARLA to stage controlled goal-directed navigation scenarios of increasing difficulty. We manipulate the complexity of the route that must be traversed, the presence of traffic, and the environmental conditions (Figures \ref{g:CARLA} and \ref{g:CARLA-2}). 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{CARLA.png}
+\caption{A third-person view in four weather conditions. Clock- wise from top left: clear day, daytime rain, daytime shortly after rain, and clear sunset adopted from \citep{CARLA:2017}}
+\label{g:CARLA}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{CARLA-2.png}
+\caption{Three of the sensing modalities provided by CARLA. From left to right: normal vision camera, ground-truth depth, and ground-truth semantic segmentation. Depth and semantic segmen- tation are pseudo-sensors that support experiments that control for the role of perception. Additional sensor models can be plugged in via the API adopted from \citep{CARLA:2017}}
+\label{g:CARLA-2}
+\end{figure}
+
+\newpage
+\bibliography{myBib}
+\bibliographystyle{apalike}
+\end{document}
